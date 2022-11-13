@@ -8,10 +8,16 @@
  * @format
  */
 
-import React from 'react';
-import {ScrollView} from 'react-native';
+import React, {useRef} from 'react';
+import {View, StyleSheet, Animated, Dimensions} from 'react-native';
 
-import Card from './components/Card';
+import Card, {
+  cardHeight,
+  cardTitleHeight,
+  cardPadding,
+} from './components/Card';
+
+const {height} = Dimensions.get('window');
 
 const cards = [
   {
@@ -32,12 +38,64 @@ const cards = [
 ];
 
 const JuiceCard = () => {
+  const scrollY = useRef<Animated.Value>(new Animated.Value(0)).current;
+
+  const _onScroll = Animated.event(
+    [
+      {
+        nativeEvent: {
+          contentOffset: {
+            y: scrollY,
+          },
+        },
+      },
+    ],
+    {useNativeDriver: true},
+  );
+
   return (
-    <ScrollView>
-      {cards.map((item, i) => {
-        return <Card style={{backgroundColor: item.color}} />;
-      })}
-    </ScrollView>
+    <View style={styles.container}>
+      <View style={StyleSheet.absoluteFill}>
+        {cards.map((item, i) => {
+          const inputRange = [-cardHeight, 0];
+          const outputRange = [
+            cardHeight * i,
+            (cardHeight - cardTitleHeight) * -i,
+          ];
+          if (i > 0) {
+            inputRange.push(cardPadding * i);
+            outputRange.push((cardHeight - cardPadding) * -i);
+          }
+          const translateY = scrollY.interpolate({
+            inputRange,
+            outputRange,
+            extrapolateRight: 'clamp',
+          });
+          return (
+            <Animated.View
+              key={i}
+              style={{transform: [{translateY}, {perspective: 1000}]}}>
+              <Card style={{backgroundColor: item.color}} />
+            </Animated.View>
+          );
+        })}
+      </View>
+      <Animated.ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        onScroll={_onScroll}
+      />
+    </View>
   );
 };
 export default JuiceCard;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  content: {
+    height: height * 2,
+  },
+});

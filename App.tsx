@@ -13,13 +13,15 @@ import {SafeAreaView, StatusBar, useColorScheme} from 'react-native';
 
 import {Colors} from 'react-native/Libraries/NewAppScreen';
 
-import JuiceCard from './src/JuiceCard';
+// import JuiceCard from './src/JuiceCard';
+import WalletCard from './src/WalletCard';
 
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    flex: 1,
   };
 
   return (
@@ -28,7 +30,7 @@ const App = () => {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <JuiceCard />
+      <WalletCard />
     </SafeAreaView>
   );
 };
